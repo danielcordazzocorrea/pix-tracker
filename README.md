@@ -19,7 +19,7 @@ Getting Started
 To run this project locally, follow these steps:
 
 # 1. Clone the repository
-git clone https://github.com/danielcordazzocorrea/pix-tracker-pro.git
+git clone https://github.com/danielcordazzocorrea/pix-tracker.git
 
 # 2. Navigate into the project folder
 cd pix-tracker
