@@ -1,0 +1,204 @@
+{
+  "name": "e-mail dashboard",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        16,
+        -96
+      ],
+      "id": "b354da13-4015-43d4-9a80-e17a729ccd47",
+      "name": "Gmail Trigger"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.Subject }}",
+                    "rightValue": "Pix realizado",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "4e8bb05f-4149-4602-8b1e-f5110ea14d12"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "496881c2-46eb-4aeb-ad76-b810ade2125f",
+                    "leftValue": "={{ $json.Subject }}",
+                    "rightValue": "=Pix recebido",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        -96
+      ],
+      "id": "944cf8e4-7b3d-4a73-98b0-bb6e28aa2635",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "tableId": "pix_transactions",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "type",
+              "fieldValue": "received"
+            },
+            {
+              "fieldId": "amount",
+              "fieldValue": "={{ Number((($json[\"snippet\"].match(/R\\$\\s?(\\d+,\\d{2})/) || [])[1] || \"0\").replace(\",\", \".\")) }}\n"
+            },
+            {
+              "fieldId": "sender_name",
+              "fieldValue": "={{ ($json[\"snippet\"].match(/Pix de (.*?)\\./) || [])[1] || \"\" }}"
+            },
+            {
+              "fieldId": "receiver_name",
+              "fieldValue": "[Coloque seu nome]"
+            },
+            {
+              "fieldId": "transaction_date",
+              "fieldValue": "={{\n  (() => {\n    const texto = ($json[\"snippet\"] || \"\").trim();\n\n    const matchData = texto.match(/\\d{2}\\/\\d{2}\\/\\d{2}/);\n    const matchHora = texto.match(/\\d{2}h\\d{2}/);\n\n    if (!matchData) return $now;\n\n    const [dia, mes, ano] = matchData[0].split(\"/\");\n\n    let hora = \"00\";\n    let minuto = \"00\";\n\n    if (matchHora) {\n      [hora, minuto] = matchHora[0].replace(\"h\", \":\").split(\":\");\n    }\n\n    return `20${ano}-${mes}-${dia}T${hora}:${minuto}:00Z`;\n  })()\n}}\n"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        512,
+        48
+      ],
+      "id": "86eb1ebf-9cda-4886-bee3-7bbae720e5ff",
+      "name": "Create a row"
+    },
+    {
+      "parameters": {
+        "tableId": "pix_transactions",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "type",
+              "fieldValue": "sent"
+            },
+            {
+              "fieldId": "amount",
+              "fieldValue": "={{ Number((($json[\"snippet\"].match(/R\\$\\s?(\\d+,\\d{2})/) || [])[1] || \"0\").replace(\",\", \".\")) }}\n"
+            },
+            {
+              "fieldId": "sender_name",
+              "fieldValue": "=[Coloque seu nome]"
+            },
+            {
+              "fieldId": "receiver_name",
+              "fieldValue": "={{ ($json[\"snippet\"].match(/Pix enviado para (.*?)\\,/) || [])[1] || \"\" }}"
+            },
+            {
+              "fieldId": "transaction_date",
+              "fieldValue": "={{\n  (() => {\n    const texto = ($json[\"snippet\"] || \"\").trim();\n\n    const matchData = texto.match(/\\d{2}\\/\\d{2}\\/\\d{2}/);\n    const matchHora = texto.match(/\\d{2}h\\d{2}/);\n\n    if (!matchData) return $now;\n\n    const [dia, mes, ano] = matchData[0].split(\"/\");\n\n    let hora = \"00\";\n    let minuto = \"00\";\n\n    if (matchHora) {\n      [hora, minuto] = matchHora[0].replace(\"h\", \":\").split(\":\");\n    }\n\n    return `20${ano}-${mes}-${dia}T${hora}:${minuto}:00Z`;\n  })()\n}}\n"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        528,
+        -240
+      ],
+      "id": "e5724143-6585-4c15-9410-230ac78ee0c9",
+      "name": "Create a row1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Create a row1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timezone": "America/Sao_Paulo",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}
