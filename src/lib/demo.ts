@@ -1,4 +1,5 @@
 export const DEMO_MODE_KEY = "pix-dashboard-demo-mode";
+export const DEMO_AUTH_KEY = "pix-dashboard-demo-authenticated";
 
 export interface PixTransaction {
   id: string;
@@ -18,6 +19,9 @@ export interface PixTransaction {
 export const isDemoMode = () => localStorage.getItem(DEMO_MODE_KEY) === "true";
 export const startDemoMode = () => localStorage.setItem(DEMO_MODE_KEY, "true");
 export const stopDemoMode = () => localStorage.removeItem(DEMO_MODE_KEY);
+export const isDemoAuthenticated = () => sessionStorage.getItem(DEMO_AUTH_KEY) === "true";
+export const signInDemo = () => sessionStorage.setItem(DEMO_AUTH_KEY, "true");
+export const signOutDemo = () => sessionStorage.removeItem(DEMO_AUTH_KEY);
 
 const received = [
   ["Marina Oliveira", "Projeto de identidade visual"],

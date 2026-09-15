@@ -1,15 +1,17 @@
 import { useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import BrandMark from "@/components/BrandMark";
 import StatsCard from "@/components/StatsCard";
 import TransactionChart from "@/components/TransactionChart";
 import TransactionTable from "@/components/TransactionTable";
-import { createDemoTransactions, createDemoTransactionsForMonth, PixTransaction } from "@/lib/demo";
+import { createDemoTransactions, createDemoTransactionsForMonth, PixTransaction, signOutDemo } from "@/lib/demo";
 
 const money = (value: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
 const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
 const Index = () => {
+  const navigate = useNavigate();
   const [transactions] = useState<PixTransaction[]>(() => createDemoTransactions());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -26,12 +28,13 @@ const Index = () => {
 
   const moveMonth = (amount: number) => { const date = new Date(selectedYear, selectedMonth + amount, 1); setSelectedMonth(date.getMonth()); setSelectedYear(date.getFullYear()); };
   const goToday = () => { const now = new Date(); setSelectedMonth(now.getMonth()); setSelectedYear(now.getFullYear()); };
+  const logout = () => { signOutDemo(); navigate("/auth", { replace: true }); };
 
   return <div className="min-h-screen bg-background">
     <header className="border-b border-border px-4 sm:px-6 py-4">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
         <div><BrandMark /><p className="text-xs text-muted-foreground mt-1 ml-10 hidden sm:block">Automação de transações via e-mail</p></div>
-        <div className="flex items-center gap-2"><div className="h-2 w-2 rounded-full bg-primary" /><span className="text-xs text-muted-foreground">Dados demonstrativos</span></div>
+        <div className="flex items-center gap-2"><div className="h-2 w-2 rounded-full bg-primary" /><span className="text-xs text-muted-foreground hidden sm:inline">Dados demonstrativos</span><button onClick={logout} className="ml-1 sm:ml-3 flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-xs hover:bg-accent transition-colors"><LogOut size={14} /><span className="hidden sm:inline">Sair</span></button></div>
       </div>
     </header>
 
