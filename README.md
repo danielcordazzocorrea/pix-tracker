@@ -1,4 +1,4 @@
-# Pix Tracker — demonstração
+# Pix Tracker: demonstração
 
 Dashboard responsivo para visualização de transações Pix, desenvolvido com React, TypeScript, Vite, Tailwind CSS, shadcn/ui e Recharts.
 
